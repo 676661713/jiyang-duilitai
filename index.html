@@ -345,7 +345,7 @@ async function doRedeem(){
   if (!currentCheck) return;
   const v = parseInt($("tickets").value,10);
   if (isNaN(v)||v<0||!Number.isInteger(v)){ toast("银票请填非负整数"); return; }
-  if (!S("staff")){ askStaff(); return; }
+  if (!S("staff")){ askStaff(); if (!S("staff")) return; }
   $("redeemBtn").disabled = true;
   try {
     const r = await api("/rest/v1/rpc/redeem",{method:"POST",body:JSON.stringify({
@@ -374,7 +374,7 @@ async function doRedeem(){
 /* ============ 角色口令 ============ */
 function askStaff(){
   const c = prompt("请输入工作人员口令（找现场负责人领取）：");
-  if (c===null) return;
+  if (c===null||!c.trim()) return;
   setS("staff", c.trim());
   toast("已记住本台口令，可开始登记");
 }
