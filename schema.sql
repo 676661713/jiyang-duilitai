@@ -32,7 +32,7 @@ create table if not exists public.secrets (  -- 口令只经 RPC 校验，anon �
   admin_pass text not null
 );
 insert into public.secrets (id, staff_code, admin_pass)
-values ('main', 'JL-6688', 'ZG-2026-XY')      -- 默认口令，README 写了改法；正式启用前改掉
+values ('main', 'STAFF-CODE-改我', 'ADMIN-PASS-改我')  -- 占位符：部署后立刻用 admin_set_codes 或 SQL 改掉
 on conflict (id) do nothing;
 
 -- ===== 行级安全 =====
