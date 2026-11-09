@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>吉羊货栈 · 兑礼台</title>
+<style>
+:root{
+  --red:#8b1a1a; --red-d:#6b0f0f; --red-x:#a02020;
+  --gold:#d4af37; --gold-d:#b8941f; --gold-l:#f3d97b;
+  --paper:#f6efe0; --card:#fff8ea; --ink:#3a2418; --ink-2:#7a5c48;
+  --ok:#1e7d45; --ok-bg:#e4f4ea; --bad:#b81f2d; --bad-bg:#fbe7e9;
+  --line:#e8d9b8; --shadow:0 2px 10px rgba(90,20,20,.10);
+}
+@media (prefers-color-scheme:dark){:root:not([data-light]){
+  --paper:#171009; --card:#241812; --ink:#f2e6cf; --ink-2:#c9ab84;
+  --ok-bg:#0f2e1c; --bad-bg:#3a1218; --line:#4a3626; --shadow:0 2px 12px rgba(0,0,0,.5);
+  --red:#a02020; --red-d:#7a1414;
+}}
+:root[data-dark]{
+  --paper:#171009; --card:#241812; --ink:#f2e6cf; --ink-2:#c9ab84;
+  --ok-bg:#0f2e1c; --bad-bg:#3a1218; --line:#4a3626; --shadow:0 2px 12px rgba(0,0,0,.5);
+  --red:#a02020; --red-d:#7a1414;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{
+  font-family:-apple-system,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+  background:var(--paper);color:var(--ink);min-height:100vh;max-width:560px;margin:0 auto;
+}
+h1,h2,.serif{font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif}
+header{
+  background:linear-gradient(160deg,var(--red-d),var(--red) 55%,var(--red-x));
+  color:#f8e9c8;padding:14px 14px 12px;position:sticky;top:0;z-index:20;
+  border-bottom:2px solid var(--gold);box-shadow:0 2px 12px rgba(80,10,10,.35);
+}
+.htop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-size:1.35rem;letter-spacing:.12em;color:var(--gold-l);text-shadow:0 1px 2px rgba(0,0,0,.4)}
+h1 small{font-size:.72rem;color:#e9cd9a;letter-spacing:.05em;display:block;font-family:sans-serif}
+.hbtns{display:flex;gap:6px;flex-shrink:0}
+.icobtn{
+  background:rgba(0,0,0,.22);border:1px solid rgba(212,175,55,.55);color:var(--gold-l);
+  border-radius:8px;padding:6px 9px;font-size:.8rem;cursor:pointer;
+}
+.conn{display:flex;align-items:center;gap:6px;font-size:.72rem;color:#e9cd9a;margin-top:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:#7fe3a0;box-shadow:0 0 6px #7fe3a0}
+.dot.off{background:#ff8080;box-shadow:0 0 6px #ff8080}
+main{padding:12px 12px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+/* 断连横幅 */
+#banner{display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);
+  border-radius:10px;padding:10px 12px;font-size:.85rem;margin-bottom:12px;text-align:center}
+#banner.on{display:block}
+/* 统计 */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px;box-shadow:var(--shadow)}
+.stat .n{font-size:1.3rem;font-weight:700;color:var(--red);font-family:Georgia,serif}
+.stat .l{font-size:.68rem;color:var(--ink-2);margin-top:2px}
+.stat.big .n{color:var(--gold-d)}
+/* 表单 */
+label{display:block;font-size:.82rem;color:var(--ink-2);margin:10px 0 4px}
+input[type=text],input[type=number],input[type=password],select{
+  width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:1rem;
+  background:var(--card);color:var(--ink);outline:none;
+}
+input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.18)}
+.btn{
+  display:block;width:100%;padding:13px;border:none;border-radius:11px;font-size:1.02rem;font-weight:600;
+  cursor:pointer;letter-spacing:.06em;margin-top:12px;transition:transform .05s;
+}
+.btn:active{transform:scale(.985)}
+.btn-gold{background:linear-gradient(160deg,var(--gold-l),var(--gold));color:#4a2e00;border:1px solid var(--gold-d)}
+.btn-red{background:linear-gradient(160deg,var(--red-x),var(--red-d));color:#f8e9c8;border:1px solid var(--red-d)}
+.btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink-2);font-weight:400}
+.btn[disabled]{opacity:.5;pointer-events:none}
+/* 资格结果 */
+#verdict{display:none;margin-top:12px;border-radius:11px;padding:12px;font-size:.95rem;line-height:1.55}
+#verdict.ok{display:block;background:var(--ok-bg);border:1.5px solid var(--ok);color:var(--ok)}
+#verdict.bad{display:block;background:var(--bad-bg);border:1.5px solid var(--bad);color:var(--bad)}
+#verdict .d{font-size:.82rem;margin-top:4px;opacity:.85}
+/* 银票/档位 */
+#redeemBox{display:none;margin-top:12px;border-top:1px dashed var(--line);padding-top:4px}
+.tierTag{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:20px;font-size:.9rem;font-weight:600;
+  border:1.5px solid var(--gold);background:rgba(212,175,55,.12);color:var(--gold-d)}
+.tierTag.down{border-color:var(--ink-2);color:var(--ink-2);background:transparent}
+.tierTag small{display:block;font-weight:400;font-size:.72rem}
+#success{display:none;margin-top:12px;background:var(--ok-bg);border:2px solid var(--ok);border-radius:12px;
+  padding:16px;text-align:center;color:var(--ok)}
+#success .t{font-size:1.5rem;font-weight:700;font-family:"Songti SC",serif}
+/* 记录 */
+.rhead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rhead h2{font-size:1.05rem;color:var(--red)}
+#search{width:170px;padding:8px 10px;font-size:.85rem}
+.rec{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px dashed var(--line);font-size:.86rem}
+.rec:last-child{border-bottom:none}
+.rec .who{flex:1;min-width:0}
+.rec .who b{font-size:.95rem}
+.rec .who .meta{color:var(--ink-2);font-size:.75rem;margin-top:2px}
+.rec .who .meta .warn{color:var(--bad)}
+.rec .tk{font-family:Georgia,serif;font-weight:700;color:var(--red);white-space:nowrap}
+.tier{white-space:nowrap;padding:3px 9px;border-radius:14px;font-size:.76rem;font-weight:600;border:1px solid}
+.tier-大礼{color:#8a5a00;border-color:var(--gold);background:rgba(212,175,55,.15)}
+.tier-中礼{color:var(--red);border-color:var(--red)}
+.tier-小礼{color:#7a5c48;border-color:var(--line)}
+.tier-保底礼{color:var(--ink-2);border-color:var(--line);opacity:.8}
+.vbtn{border:1px solid var(--line);background:none;color:var(--ink-2);border-radius:8px;font-size:.72rem;padding:5px 8px;cursor:pointer}
+.vbtn:hover{border-color:var(--bad);color:var(--bad)}
+.empty{text-align:center;color:var(--ink-2);font-size:.85rem;padding:18px 0}
+/* 弹层 */
+.modal{position:fixed;inset:0;background:rgba(20,5,5,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.modal.on{display:flex}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px 26px;
+  border-top:3px solid var(--gold);max-height:82vh;overflow-y:auto}
+.sheet h2{color:var(--red);font-size:1.15rem;margin-bottom:4px}
+.sheet .sub{color:var(--ink-2);font-size:.82rem;margin-bottom:8px}
+.sheet .row2{display:flex;gap:10px}
+.sheet .row2 .btn{margin-top:10px}
+.hr{border:none;border-top:1px dashed var(--line);margin:14px 0}
+.mtag{display:inline-block;font-size:.7rem;border:1px solid var(--gold);color:var(--gold-d);border-radius:10px;padding:2px 8px;margin-bottom:8px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#2a1510;color:#f3d97b;
+  padding:10px 20px;border-radius:24px;font-size:.88rem;border:1px solid var(--gold);z-index:99;display:none;max-width:90vw;text-align:center}
+.toast.on{display:block}
+footer{text-align:center;color:var(--ink-2);font-size:.7rem;padding:8px 0 20px}
+</style>
+</head>
+<body>
+<header>
+  <div class="htop">
+    <h1>吉羊货栈 · 兑礼台<small>吉羊市集 · 国风银票游园会</small></h1>
+    <div class="hbtns">
+      <button class="icobtn" id="darkBtn" title="深浅色">◐</button>
+      <button class="icobtn" id="adminBtn">管理</button>
+    </div>
+  </div>
+  <div class="conn"><span class="dot" id="connDot"></span><span id="connText">后台已连接</span>
+    <span style="margin-left:auto">经手人：<input id="handler" style="width:72px;background:rgba(0,0,0,.2);border:1px solid rgba(212,175,55,.4);color:#f8e9c8;border-radius:6px;padding:2px 6px;font-size:.75rem" placeholder="台号"></span>
+  </div>
+</header>
+<main>
+  <div id="banner">⚠ 暂时连不上兑换后台，记录可能不是最新</div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="stTotal">0</div><div class="l">已兑换</div></div>
+    <div class="stat big"><div class="n" id="stBig">–</div><div class="l">大礼剩余/总数</div></div>
+    <div class="stat"><div class="n" id="stMid">0</div><div class="l">中礼</div></div>
+    <div class="stat"><div class="n" id="stSmall">0</div><div class="l">小礼</div></div>
+  </div>
+  <div class="stats" style="grid-template-columns:repeat(2,1fr);margin-top:8px">
+    <div class="stat"><div class="n" id="stBigCnt">0</div><div class="l">大礼已兑</div></div>
+    <div class="stat"><div class="n" id="stFloor">0</div><div class="l">保底礼</div></div>
+  </div>
+
+  <div class="card">
+    <h2 class="serif" style="color:var(--red);font-size:1.05rem">查询兑换资格</h2>
+    <label>部门（必填）</label>
+    <input id="dept" list="deptList" placeholder="来宾报的部门" autocomplete="off" inputmode="text">
+    <datalist id="deptList"></datalist>
+    <label>姓名（必填）</label>
+    <input id="name" placeholder="来宾姓名" autocomplete="off" inputmode="text">
+    <button class="btn btn-red" id="checkBtn">查询兑换资格</button>
+    <div id="verdict"></div>
+    <div id="redeemBox">
+      <label>手中银票（两）</label>
+      <input id="tickets" type="number" min="0" step="1" inputmode="numeric" placeholder="非负整数">
+      <div><span class="tierTag" id="tierTag">—</span></div>
+      <button class="btn btn-gold" id="redeemBtn">确认兑换并回收银票</button>
+    </div>
+    <div id="success"><div class="t" id="successTier"></div><div>登记成功，请发放</div></div>
+  </div>
+
+  <div class="card">
+    <div class="rhead">
+      <h2>兑换记录</h2>
+      <input id="search" type="text" placeholder="搜姓名 / 部门">
+    </div>
+    <div id="recs"><div class="empty">暂无兑换记录</div></div>
+  </div>
+
+  <footer>吉羊货栈兑礼台 · 同一来宾仅可兑换一次</footer>
+</main>
+
+<!-- 管理弹层 -->
+<div class="modal" id="adminModal"><div class="sheet">
+  <span class="mtag">管理员区</span>
+  <h2>兑礼台管理</h2>
+  <div class="sub">仅管理员可操作作废记录、修改大礼份数、修改口令</div>
+  <div id="adminAuth">
+    <label>管理口令</label>
+    <input id="adminPass" type="password" placeholder="输入管理口令" autocomplete="off">
+    <button class="btn btn-red" id="adminLogin">验证口令</button>
+  </div>
+  <div id="adminPanel" style="display:none">
+    <hr class="hr">
+    <label>大礼限量份数（当前 <b id="curStock">–</b>）</label>
+    <input id="newStock" type="number" min="0" step="1" inputmode="numeric">
+    <button class="btn btn-gold" id="saveStock">保存大礼份数</button>
+    <hr class="hr">
+    <label>新工作人员口令（留空不改）</label>
+    <input id="newStaff" type="text" placeholder="新口令" autocomplete="off">
+    <label>新管理口令（留空不改）</label>
+    <input id="newAdmin" type="text" placeholder="新口令" autocomplete="off">
+    <button class="btn btn-gold" id="saveCodes">保存口令修改</button>
+    <hr class="hr">
+    <div class="sub">作废记录：在下方记录列表点「作废」，页内二次确认后生效，作废后此人可再次兑换。</div>
+    <button class="btn btn-ghost" id="adminLogout">退出管理</button>
+  </div>
+  <div class="row2"><button class="btn btn-ghost" id="adminClose">关闭</button></div>
+</div></div>
+
+<!-- 二次确认弹层 -->
+<div class="modal" id="confirmModal"><div class="sheet">
+  <h2>确认作废</h2>
+  <div class="sub" id="confirmText"></div>
+  <div class="row2">
+    <button class="btn btn-ghost" id="cfCancel">取消</button>
+    <button class="btn btn-red" id="cfOk">确认作废</button>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============ 配置 ============ */
+const SB_URL = "https://bwjxxhpfvsokczrkdhcs.supabase.co";
+const SB_KEY = "sb_publishable_HGQ-HLgLip5Vg71hwK2Idg_Kh17Tfkg"; // 公开 publishable key，写权限在服务端 RPC 里收口
+const POLL_MS = 2500, STALE_MS = 10000;
+
+/* ============ 状态 ============ */
+let rows = [], bigStock = 50, lastOk = 0, pollT = null;
+let currentCheck = null;      // 查询结果 {key,dept,name}
+const S = k => sessionStorage.getItem("jl_"+k) || "";
+const setS = (k,v) => v ? sessionStorage.setItem("jl_"+k,v) : sessionStorage.removeItem("jl_"+k);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => (s||"").normalize("NFKC").replace(/\s+/g,"").toLowerCase();   // 去所有空格、英文不区分大小写
+const keyOf = (d,n) => norm(d)+"|"+norm(n);
+
+/* ============ 网络 ============ */
+async function api(path, opt={}) {
+  const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 8000);
+  try {
+    const r = await fetch(SB_URL+path, {
+      ...opt, signal: ctl.signal,
+      headers: {"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json",...(opt.headers||{})}
+    });
+    lastOk = Date.now(); setConn(true);
+    return r;
+  } catch(e){ setConn(false); throw e; }
+  finally { clearTimeout(t); }
+}
+function setConn(ok){ $("connDot").className = "dot"+(ok?"":" off"); $("connText").textContent = ok?"后台已连接":"连接中…"; }
+function toast(m, ms=2600){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("on"),ms); }
+
+async function refresh() {
+  try {
+    const [r,c] = await Promise.all([
+      api("/rest/v1/redemptions?select=key,dept,name,tickets,tier,downgraded,at,by&order=at.desc&limit=1000"),
+      api("/rest/v1/config?select=big_stock&id=eq.main")
+    ]);
+    if (r.ok) rows = await r.json();
+    if (c.ok){ const cc = await c.json(); if (cc[0]) bigStock = cc[0].big_stock; }
+    render();
+  } catch(e){ /* setConn(false) 已在 api 内处理 */ }
+}
+
+/* ============ 渲染 ============ */
+function bigUsed(){ return rows.filter(r=>r.tier==="大礼").length; }
+function render(){
+  const n = rows.length, bu = bigUsed();
+  $("stTotal").textContent = n;
+  $("stBig").textContent = Math.max(0,bigStock-bu)+"/"+bigStock;
+  $("stBigCnt").textContent = bu;
+  $("stMid").textContent = rows.filter(r=>r.tier==="中礼").length;
+  $("stSmall").textContent = rows.filter(r=>r.tier==="小礼").length;
+  $("stFloor").textContent = rows.filter(r=>r.tier==="保底礼").length;
+  $("curStock").textContent = bigStock;
+  // 部门联想
+  const dl = $("deptList"); const depts = [...new Set(rows.map(r=>r.dept))];
+  if (dl.childElementCount !== depts.length) dl.innerHTML = depts.map(d=>`<option value="${esc(d)}">`).join("");
+  // 断连横幅
+  const stale = Date.now()-lastOk > STALE_MS;
+  $("banner").classList.toggle("on", stale);
+  $("connDot").className = "dot"+(stale?" off":"");
+  $("connText").textContent = stale?"连接中断":"后台已连接";
+  renderRecs();
+  if (currentCheck && $("redeemBox").style.display==="block") renderTierPreview();
+}
+function renderRecs(){
+  const q = norm($("search").value);
+  const list = q ? rows.filter(r=>norm(r.name).includes(q)||norm(r.dept).includes(q)) : rows;
+  $("recs").innerHTML = list.length ? list.map(r=>{
+    const t = new Date(r.at); const hh=String(t.getHours()).padStart(2,"0"), mm=String(t.getMinutes()).padStart(2,"0");
+    return `<div class="rec">
+      <div class="who"><b>${esc(r.name)}</b> <span class="meta">${esc(r.dept)}</span>
+        <div class="meta">${hh}:${mm} · ${r.by?esc(r.by):""}${r.downgraded?' <span class="warn">大礼已兑完，按中礼兑换</span>':""}</div></div>
+      <div class="tk">${r.tickets}两</div>
+      <span class="tier tier-${r.tier}">${r.tier}</span>
+      ${S("admin")?`<button class="vbtn" data-k="${esc(r.key)}" data-d="${esc(r.dept)}" data-n="${esc(r.name)}">作废</button>`:""}
+    </div>`;
+  }).join("") : `<div class="empty">${q?"没有匹配的记录":"暂无兑换记录"}</div>`;
+}
+
+/* ============ 查询资格 ============ */
+async function doCheck(){
+  const dept = $("dept").value.trim(), name = $("name").value.trim();
+  $("success").style.display="none";
+  if (!dept || !name){ toast("部门和姓名都要填"); return; }
+  const key = keyOf(dept,name);
+  $("checkBtn").disabled = true;
+  try {
+    // 本地 + 远端双重确认（远端为准，防轮询空档）
+    const r = await api("/rest/v1/redemptions?select=key,dept,name,tickets,tier,downgraded,at,by&key=eq."+encodeURIComponent(key));
+    const found = r.ok ? (await r.json())[0] : rows.find(x=>x.key===key);
+    if (found){
+      currentCheck = null;
+      $("redeemBox").style.display="none";
+      const t = new Date(found.at);
+      $("verdict").className="bad"; $("verdict").style.display="block";
+      $("verdict").innerHTML = `已兑换过，不能重复领取
+        <div class="d">${esc(found.dept)} · ${esc(found.name)}｜${t.getMonth()+1}月${t.getDate()}日 ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}
+        ｜银票 ${found.tickets} 两｜已领 ${found.tier}${found.downgraded?"（大礼兑完按中礼）":""}</div>`;
+    } else {
+      currentCheck = {key, dept, name};
+      $("verdict").className="ok"; $("verdict").style.display="block";
+      $("verdict").innerHTML = `未兑换过，可以领取<div class="d">请收取来宾手中银票并填写数量</div>`;
+      $("redeemBox").style.display="block";
+      $("tickets").value=""; $("tickets").focus(); renderTierPreview();
+    }
+  } catch(e){ toast("查询失败，请重试"); }
+  finally { $("checkBtn").disabled = false; }
+}
+function renderTierPreview(){
+  const v = parseInt($("tickets").value,10); const tag = $("tierTag");
+  if (isNaN(v)||v<0){ tag.textContent="—"; tag.className="tierTag"; return; }
+  let t,down=false;
+  if (v>=10){ if (bigUsed()<bigStock) t="大礼"; else { t="中礼"; down=true; } }
+  else if (v>=6) t="中礼"; else if (v>=3) t="小礼"; else t="保底礼";
+  tag.className = "tierTag"+(down?" down":"");
+  tag.innerHTML = `可兑：${t}`+(down?"<small>大礼已兑完，按中礼兑换</small>":(t==="大礼"?`<small>限量剩 ${Math.max(0,bigStock-bigUsed())} 份</small>`:""));
+}
+/* ============ 登记兑换 ============ */
+async function doRedeem(){
+  if (!currentCheck) return;
+  const v = parseInt($("tickets").value,10);
+  if (isNaN(v)||v<0||!Number.isInteger(v)){ toast("银票请填非负整数"); return; }
+  if (!S("staff")){ askStaff(); return; }
+  $("redeemBtn").disabled = true;
+  try {
+    const r = await api("/rest/v1/rpc/redeem",{method:"POST",body:JSON.stringify({
+      p_key:currentCheck.key,p_dept:currentCheck.dept,p_name:currentCheck.name,
+      p_tickets:v,p_by:$("handler").value.trim(),p_staff:S("staff")})});
+    const j = await r.json();
+    if (j.ok){
+      $("redeemBox").style.display="none"; $("verdict").style.display="none";
+      $("success").style.display="block";
+      $("successTier").textContent = j.tier + (j.downgraded?"（大礼已兑完，按中礼兑换）":"");
+      $("success").lastElementChild.textContent = "登记成功，请发放：" + j.tier + (j.downgraded?" · 已按中礼":"");
+      $("dept").value=""; $("name").value=""; $("tickets").value=""; currentCheck=null;
+      $("dept").focus();
+      await refresh();
+    } else if (j.err==="duplicate"){
+      $("redeemBox").style.display="none"; currentCheck=null;
+      $("verdict").className="bad"; $("verdict").style.display="block";
+      $("verdict").textContent="已兑换过，不能重复领取（另一台可能刚登记）";
+      await refresh();
+    } else if (j.err==="auth"){
+      setS("staff",""); toast(j.msg||"口令不正确，请找负责人开权限"); askStaff();
+    } else { toast(j.msg||"写入失败，请重试"); }
+  } catch(e){ toast("写入失败，请重试"); }
+  finally { $("redeemBtn").disabled = false; }
+}
+/* ============ 角色口令 ============ */
+function askStaff(){
+  const c = prompt("请输入工作人员口令（找现场负责人领取）：");
+  if (c===null) return;
+  setS("staff", c.trim());
+  toast("已记住本台口令，可开始登记");
+}
+/* ============ 作废 ============ */
+let pendingVoid = null;
+$("recs").addEventListener("click", e=>{
+  const b = e.target.closest(".vbtn"); if (!b) return;
+  pendingVoid = {key:b.dataset.k};
+  $("confirmText").textContent = `作废「${b.dataset.d} · ${b.dataset.n}」的兑换记录？作废后此人可再次兑换。`;
+  $("confirmModal").classList.add("on");
+});
+$("cfCancel").onclick = ()=>{ $("confirmModal").classList.remove("on"); pendingVoid=null; };
+$("cfOk").onclick = async ()=>{
+  if (!pendingVoid) return;
+  $("cfOk").disabled = true;
+  try {
+    const r = await api("/rest/v1/rpc/admin_void",{method:"POST",body:JSON.stringify({p_key:pendingVoid.key,p_pass:S("admin")})});
+    const j = await r.json();
+    if (j.ok){ toast("已作废，此人可再次兑换"); await refresh(); }
+    else if (j.err==="auth"){ setS("admin",""); toast(j.msg||"管理口令不正确"); $("adminPanel").style.display="none"; $("adminAuth").style.display="block"; $("adminModal").classList.add("on"); }
+    else toast(j.msg||"作废失败");
+  } catch(e){ toast("操作失败，请重试"); }
+  finally { $("cfOk").disabled=false; $("confirmModal").classList.remove("on"); pendingVoid=null; }
+};
+/* ============ 管理 ============ */
+$("adminBtn").onclick = ()=>{
+  $("adminModal").classList.add("on");
+  const has = !!S("admin");
+  $("adminAuth").style.display = has?"none":"block";
+  $("adminPanel").style.display = has?"block":"none";
+};
+$("adminClose").onclick = ()=>$("adminModal").classList.remove("on");
+$("adminLogin").onclick = async ()=>{
+  const p = $("adminPass").value.trim(); if (!p) return;
+  // 用一次零副作用校验：改份数为当前值
+  try {
+    const r = await api("/rest/v1/rpc/admin_set_stock",{method:"POST",body:JSON.stringify({p_stock:bigStock,p_pass:p})});
+    const j = await r.json();
+    if (j.ok){ setS("admin",p); $("adminAuth").style.display="none"; $("adminPanel").style.display="block"; $("adminPass").value=""; renderRecs(); toast("已进入管理模式"); }
+    else toast(j.msg||"管理口令不正确");
+  } catch(e){ toast("校验失败，请重试"); }
+};
+$("adminLogout").onclick = ()=>{ setS("admin",""); $("adminPanel").style.display="none"; $("adminAuth").style.display="block"; renderRecs(); };
+$("saveStock").onclick = async ()=>{
+  const v = parseInt($("newStock").value,10);
+  if (isNaN(v)||v<0){ toast("份数不正确"); return; }
+  try {
+    const r = await api("/rest/v1/rpc/admin_set_stock",{method:"POST",body:JSON.stringify({p_stock:v,p_pass:S("admin")})});
+    const j = await r.json();
+    if (j.ok){ toast("大礼份数已改为 "+v); $("newStock").value=""; await refresh(); }
+    else { setS("admin",""); toast(j.msg||"操作失败"); }
+  } catch(e){ toast("操作失败，请重试"); }
+};
+$("saveCodes").onclick = async ()=>{
+  const ns = $("newStaff").value.trim(), na = $("newAdmin").value.trim();
+  if (!ns && !na){ toast("两个都留空则不改"); return; }
+  try {
+    const r = await api("/rest/v1/rpc/admin_set_codes",{method:"POST",body:JSON.stringify({p_new_staff:ns||"",p_new_admin:na||"",p_pass:S("admin")})});
+    const j = await r.json();
+    if (j.ok){ toast("口令已更新，请同步各兑礼台"); $("newStaff").value=""; $("newAdmin").value=""; if(na) setS("admin",na); if(ns) setS("staff",ns); }
+    else toast(j.msg||"操作失败");
+  } catch(e){ toast("操作失败，请重试"); }
+};
+/* ============ 事件 ============ */
+$("checkBtn").onclick = doCheck;
+$("redeemBtn").onclick = doRedeem;
+$("tickets").oninput = renderTierPreview;
+$("search").oninput = renderRecs;
+$("name").addEventListener("keydown", e=>{ if(e.key==="Enter") doCheck(); });
+$("dept").addEventListener("keydown", e=>{ if(e.key==="Enter") $("name").focus(); });
+$("tickets").addEventListener("keydown", e=>{ if(e.key==="Enter") doRedeem(); });
+$("handler").value = S("handler");
+$("handler").onchange = e=>setS("handler", e.target.value.trim());
+$("darkBtn").onclick = ()=>{
+  const r = document.documentElement;
+  const dark = r.dataset.dark==="1" || (!r.dataset.light && matchMedia("(prefers-color-scheme:dark)").matches);
+  if (dark){ r.dataset.light="1"; delete r.dataset.dark; setS("theme","light"); }
+  else { r.dataset.dark="1"; delete r.dataset.light; setS("theme","dark"); }
+};
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("on"); }));
+
+/* ============ 启动 ============ */
+if (S("theme")==="dark") document.documentElement.dataset.dark="1";
+if (S("theme")==="light") document.documentElement.dataset.light="1";
+refresh();
+pollT = setInterval(refresh, POLL_MS);
+setInterval(()=>{ const stale=Date.now()-lastOk>STALE_MS; $("banner").classList.toggle("on",stale);
+  $("connDot").className="dot"+(stale?" off":""); $("connText").textContent=stale?"连接中断":"后台已连接"; }, 3000);
+</script>
+</body>
+</html>
