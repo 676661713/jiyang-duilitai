@@ -1,0 +1,16 @@
+吉羊货栈 · 兑礼台
+================
+
+正式访问地址（手机/电脑浏览器直接打开）：
+  https://676661713.github.io/jiyang-duilitai/
+
+后台：Supabase 项目 jiyang-duilitai（区域 ap-northeast-2 首尔）
+  https://bwjxxhpfvsokczrkdhcs.supabase.co
+  管理台：https://supabase.com/dashboard/project/bwjxxhpfvsokczrkdhcs
+
+页面源码：https://github.com/676661713/jiyang-duilitai
+（GitHub Pages 托管 main 分支根目录）
+
+默认口令（正式启用前务必改掉，改法见 README「口令怎么改」）：
+  工作人员口令：JL-6688
+  管理口令：    ZG-2026-XY
